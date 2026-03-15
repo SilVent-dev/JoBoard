@@ -120,7 +120,7 @@ public class UsuarioServico {
                 .build();
 
         tokenVerificacaoEmailRepositorio.save(token);
-        emailServico.enviarVerificacao(usuario.getEmail(), tokenvalor);
+        emailServico.enviarVerificacao(usuario.getEmail(), usuario.getNome(), tokenvalor);
 
     }
 }
