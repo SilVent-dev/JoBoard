@@ -39,7 +39,7 @@ public class Usuario {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status_conta", nullable = false, length = 40)
-    private StatusContaEnum statusConta = StatusContaEnum.CADASTRO_PENDENTE_CONFIRMACAO;
+    private StatusContaEnum statusConta;
 
     @Column(name = "criado_em", nullable = false, updatable = false)
     private LocalDateTime criadoEm;

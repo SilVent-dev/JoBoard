@@ -7,5 +7,6 @@ import jakarta.validation.constraints.Size;
 public record CadastroDTO(
         @NotBlank String nome,
         @NotBlank @Email String email,
-        @NotBlank @Size(min = 8) String senhaHash) {
+        @NotBlank @Size(min = 8) String senha
+) {
 }
