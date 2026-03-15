@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.proxy.HibernateProxy;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,26 +26,25 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Email(message = "Email inválido")
-    @NotBlank(message = "Email obrigatório")
     @Column(nullable = false, unique = true, length = 255)
     private String email;
 
-    @NotBlank(message = "Senha obrigatória")
     @Column(name = "senha_hash", nullable = false, length = 255)
     private String senhaHash;
 
-    @NotBlank(message = "Nome obrigatório")
     @Column(nullable = false, length = 255)
     private String nome;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "status_conta", nullable = false, length = 40)
-    private StatusContaEnum statusConta;
+    private StatusContaEnum statusConta = StatusContaEnum.CADASTRO_PENDENTE_CONFIRMACAO;
 
+    @CreationTimestamp
     @Column(name = "criado_em", nullable = false, updatable = false)
     private LocalDateTime criadoEm;
 
+    @UpdateTimestamp
     @Column(name = "atualizado_em", nullable = false)
     private LocalDateTime atualizadoEm;
 

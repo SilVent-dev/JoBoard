@@ -9,9 +9,9 @@ import br.com.joboard.dominio.enums.TipoUsuarioEnum;
 import br.com.joboard.repositorio.TipoUsuarioRepositorio;
 import br.com.joboard.repositorio.TokenVerificacaoEmailRepositorio;
 import br.com.joboard.repositorio.UsuarioRepositorio;
-import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -51,8 +51,6 @@ public class UsuarioServico {
                 .email(data.email())
                 .senhaHash(passwordEncoder.encode(data.senha()))
                 .nome(data.nome())
-                .criadoEm(LocalDateTime.now())
-                .atualizadoEm(LocalDateTime.now())
                 .tipoUsuario(List.of(tipoUsuario))
                 .statusConta(StatusContaEnum.CADASTRO_PENDENTE_CONFIRMACAO)
                 .build();

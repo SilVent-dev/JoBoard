@@ -10,7 +10,7 @@ public enum PlataformaAplicacaoEnum {
     LINKEDIN("LINKEDIN"),
     INDEED("Indeed"),
     GUPY("Gupy"),
-    GLASSDOR("Glasssdor"),
+    GLASSDOOR("Glassdoor"),
     SITE_EMPRESA("Site específico da Empresa"),
     INDICACAO("Indicacao de vaga"),
     EMAIL_DIRETO("E-mail direto da empresa"),

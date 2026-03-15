@@ -5,8 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record CadastroDTO(
-        @NotBlank String nome,
-        @NotBlank @Email String email,
-        @NotBlank @Size(min = 8) String senha
+        @NotBlank(message = "Nome obrigatório") String nome,
+        @NotBlank(message = "Email obrigatório") @Email(message = "Email inválido") String email,
+        @NotBlank(message = "Senha obrigatória") @Size(min = 8, message = "Senha deve ter no mínimo 8 caracteres") String senha
 ) {
 }

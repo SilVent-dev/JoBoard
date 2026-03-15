@@ -1,6 +1,5 @@
 package br.com.joboard.dominio.enums;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
