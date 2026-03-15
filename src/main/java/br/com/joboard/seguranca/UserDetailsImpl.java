@@ -64,4 +64,8 @@ public class UserDetailsImpl implements UserDetails {
     public boolean isEnabled() {
         return usuario.podeAutenticar();
     }
+
+    public Usuario getUsuario() {
+        return this.usuario;
+    }
 }

@@ -20,19 +20,14 @@ public class ConfiguracaoSeguranca {
     // Rotas acessíveis sem autenticação (login e cadastro)
     private static final String[] ROTAS_PUBLICAS = {
             "/auth/cadastro",
-            "/auth/login"
+            "/auth/login",
+            "/auth/verificar-email"
     };
 
     // Rotas acessíveis apenas por administradores
     private static final String[] ROTAS_ADMIN = {
             "/admin/**"
     };
-
-    private final SecurityFilter securityFilter;
-
-    public ConfiguracaoSeguranca (SecurityFilter securityFilter){
-        this.securityFilter = securityFilter;
-    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, SecurityFilter securityFilter) throws Exception{
@@ -45,7 +40,7 @@ public class ConfiguracaoSeguranca {
                         // Rotas públicas: qualquer um pode acessar
                         .requestMatchers(ROTAS_PUBLICAS).permitAll()
                         // Rotas admin: apenas usuários com role ADMIN
-                        .requestMatchers(ROTAS_ADMIN).hasRole("ADMIN")
+                        .requestMatchers(ROTAS_ADMIN).hasAuthority("ADMIN")
                         // Qualquer outra rota exige autenticação
                         .anyRequest().authenticated()
                 )
