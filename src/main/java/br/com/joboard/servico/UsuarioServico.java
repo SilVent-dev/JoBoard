@@ -6,6 +6,7 @@ import br.com.joboard.dominio.entidade.TokenVerificacaoEmail;
 import br.com.joboard.dominio.entidade.Usuario;
 import br.com.joboard.dominio.enums.StatusContaEnum;
 import br.com.joboard.dominio.enums.TipoUsuarioEnum;
+import br.com.joboard.dominio.excecao.EmailJaCadastradoException;
 import br.com.joboard.repositorio.TipoUsuarioRepositorio;
 import br.com.joboard.repositorio.TokenVerificacaoEmailRepositorio;
 import br.com.joboard.repositorio.UsuarioRepositorio;
@@ -41,7 +42,7 @@ public class UsuarioServico {
     @Transactional
     public void cadastrar (CadastroDTO data){
         if(this.usuarioRepositorio.findByEmail(data.email()).isPresent()){
-            throw new IllegalArgumentException("Email já cadastrado.");
+            throw new EmailJaCadastradoException();
         }
 
         TipoUsuario tipoUsuario = tipoUsuarioRepositorio.findByNome(TipoUsuarioEnum.USUARIO)
