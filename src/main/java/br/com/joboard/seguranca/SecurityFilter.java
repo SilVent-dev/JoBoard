@@ -1,6 +1,7 @@
 package br.com.joboard.seguranca;
 
 import br.com.joboard.dominio.entidade.Usuario;
+import br.com.joboard.dominio.excecao.RecursoNaoEncontradoException;
 import br.com.joboard.repositorio.UsuarioRepositorio;
 import br.com.joboard.servico.TokenServico;
 import jakarta.servlet.FilterChain;
@@ -32,7 +33,8 @@ public class SecurityFilter extends OncePerRequestFilter {
         if (token !=null && !token.isBlank()){
             var login = tokenServico.validarToken(token);
             if (!login.isBlank()) {
-                Usuario usuario = usuarioRepositorio.findByEmail(login).orElseThrow(() -> new RuntimeException("Usuário não encontrado!"));
+                Usuario usuario = usuarioRepositorio.findByEmail(login)
+                        .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario", login));
                 UserDetails userDetails = new UserDetailsImpl(usuario);
 
                 var autenticacao = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
