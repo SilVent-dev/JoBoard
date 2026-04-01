@@ -1,10 +1,11 @@
 package br.com.joboard.dominio.entidade;
 
+import br.com.joboard.dominio.enums.NivelExperienciaEnum;
+import br.com.joboard.dominio.enums.TipoDisponibilidadeEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.validator.constraints.br.CPF;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -36,7 +37,6 @@ public class PerfilCandidato {
     @Column(name = "nome_completo", nullable = false, length = 255)
     private String nomeCompleto;
 
-    @CPF //alterar validação para um DTO?
     @Column(nullable = false, unique = true, length = 11)
     private String cpf;
 
@@ -58,11 +58,13 @@ public class PerfilCandidato {
     @Column(name = "aceita_presencial", nullable = false)
     private Boolean aceitaPresencial = true;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "nivel_experiencia", length = 20)
-    private String nivelExperiencia;
+    NivelExperienciaEnum nivelExperiencia;
 
+    @Enumerated(EnumType.STRING)
     @Column(length = 50)
-    private String disponibilidade;
+    TipoDisponibilidadeEnum disponibilidade;
 
     @Column(name = "pretensao_salarial_min", precision = 10, scale = 2)
     private BigDecimal pretensaoSalarialMin;
