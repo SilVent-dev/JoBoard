@@ -69,4 +69,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(Map.of("mensagem", ex.getMessage()));
     }
+
+    @ExceptionHandler(EmpresaJaCadastradaException.class)
+    public ResponseEntity<Map<String, String>> handleEmpresaJaCadastrada(
+            EmpresaJaCadastradaException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("mensagem", ex.getMessage()));
+    }
+
 }

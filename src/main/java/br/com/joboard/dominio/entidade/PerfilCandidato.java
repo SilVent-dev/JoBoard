@@ -49,12 +49,15 @@ public class PerfilCandidato {
     @Column(length = 2)
     private String estado;
 
+    @Builder.Default
     @Column(name = "aceita_remoto", nullable = false)
     private Boolean aceitaRemoto = true;
 
+    @Builder.Default
     @Column(name = "aceita_hibrido", nullable = false)
     private Boolean aceitaHibrido = true;
 
+    @Builder.Default
     @Column(name = "aceita_presencial", nullable = false)
     private Boolean aceitaPresencial = true;
 
