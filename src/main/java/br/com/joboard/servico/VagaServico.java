@@ -90,7 +90,7 @@ public class VagaServico {
 
         EmpresaCatalogada empresa = empresaRepositorio
                 .findByIdAndUsuarioId(dados.empresaId(), usuarioLogado.getId())
-                .orElseThrow(() -> new AcessoNegadoException());
+                .orElseThrow(AcessoNegadoException::new);
 
 
         vaga.setEmpresa(empresa);
