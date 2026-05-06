@@ -77,4 +77,24 @@ public class GlobalExceptionHandler {
                 .body(Map.of("mensagem", ex.getMessage()));
     }
 
+    @ExceptionHandler(VagaFechadaException.class)
+    public ResponseEntity<Map<String, String>> handleVagaFechada(VagaFechadaException ex) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(Map.of("mensagem", ex.getMessage()));
+    }
+
+    @ExceptionHandler(CandidaturaDuplicadaException.class)
+    public ResponseEntity<Map<String, String>> handleCandidaturaDuplicada(
+            CandidaturaDuplicadaException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("mensagem", ex.getMessage()));
+    }
+
+    @ExceptionHandler(TransicaoStatusInvalidaException.class)
+    public ResponseEntity<Map<String, String>> handleTransicaoInvalida(
+            TransicaoStatusInvalidaException ex) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(Map.of("mensagem", ex.getMessage()));
+    }
+
 }
