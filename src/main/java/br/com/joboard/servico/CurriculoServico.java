@@ -40,7 +40,7 @@ public class CurriculoServico {
                 .tamanhoBytes(arquivo.getSize())
                 .tipoMime(arquivo.getContentType())
                 .versao(versao)
-                .ehPrincipal(ehPrimeiro) // primeiro currículo já vira principal automaticamente
+                .ehPrincipal(ehPrimeiro)
                 .build();
 
         return CurriculoResponseDTO.from(curriculoRepositorio.save(curriculo));
@@ -75,7 +75,7 @@ public class CurriculoServico {
         Curriculo curriculo = curriculoRepositorio.findByIdAndUsuarioId(id, usuarioLogado.getId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Curriculo", id));
 
-        // storage primeiro —> se falhar, banco não é tocado
+
         storageServico.deletar(curriculo.getUrlArquivo());
         curriculoRepositorio.delete(curriculo);
     }
