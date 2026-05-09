@@ -97,4 +97,17 @@ public class GlobalExceptionHandler {
                 .body(Map.of("mensagem", ex.getMessage()));
     }
 
+    @ExceptionHandler(VersaoCurriculoDuplicadaException.class)
+    public ResponseEntity<Map<String, String>> handleVersaoCurriculoDuplicada(
+            VersaoCurriculoDuplicadaException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("mensagem", ex.getMessage()));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleGenerico(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("mensagem", "Erro interno. Tente novamente mais tarde."));
+    }
+
 }

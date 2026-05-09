@@ -4,6 +4,7 @@ import br.com.joboard.dominio.DTO.CurriculoResponseDTO;
 import br.com.joboard.dominio.entidade.Curriculo;
 import br.com.joboard.dominio.entidade.Usuario;
 import br.com.joboard.dominio.excecao.RecursoNaoEncontradoException;
+import br.com.joboard.dominio.excecao.VersaoCurriculoDuplicadaException;
 import br.com.joboard.repositorio.CurriculoRepositorio;
 import br.com.joboard.seguranca.SecurityUtils;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public class CurriculoServico {
         Usuario usuarioLogado = SecurityUtils.getUsuarioLogado();
 
         if (curriculoRepositorio.existsByUsuarioIdAndVersao(usuarioLogado.getId(), versao)) {
-            throw new IllegalArgumentException("Já existe um currículo com essa versão.");
+            throw new VersaoCurriculoDuplicadaException(versao);
         }
 
         String urlArquivo = storageServico.upload(arquivo, usuarioLogado.getId());
