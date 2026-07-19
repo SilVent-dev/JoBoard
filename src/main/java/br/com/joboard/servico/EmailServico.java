@@ -21,6 +21,11 @@ public class EmailServico {
     @Value("${app.url.frontend}")
     private String urlFrontend;
 
+    // Remetente (From). Vazio em dev (usa o padrão do SMTP); em producao com Resend
+    // deve ser onboarding@resend.dev ou um endereco de dominio verificado.
+    @Value("${app.mail.from:}")
+    private String remetente;
+
     public EmailServico(JavaMailSender mailSender){
         this.mailSender = mailSender;
     }
@@ -67,6 +72,9 @@ public class EmailServico {
     private void enviar(String destinatario, String assunto, String html) throws Exception {
         MimeMessage mensagem = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mensagem, true, "UTF-8");
+        if (remetente != null && !remetente.isBlank()) {
+            helper.setFrom(remetente);
+        }
         helper.setTo(destinatario);
         helper.setSubject(assunto);
         helper.setText(html, true);
