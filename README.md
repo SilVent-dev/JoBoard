@@ -4,6 +4,8 @@ API REST do **Joboard**, um ATS pessoal (*Applicant Tracking System*) para quem 
 
 Não é uma plataforma de vagas — é uma ferramenta **privada e individual**. Cada usuário vê apenas os próprios dados, garantido por design em todas as camadas.
 
+**▶️ Em produção:** API em [joboard-87cg.onrender.com](https://joboard-87cg.onrender.com) · App: [joboard-front.onrender.com](https://joboard-front.onrender.com)
+
 > Frontend (Vue 3): [SilVent-dev/JoBoard-Front](https://github.com/SilVent-dev/JoBoard-Front)
 
 ---
@@ -152,6 +154,16 @@ Testes unitários dos services (JUnit 5 + Mockito), cobrindo as regras críticas
 docker build -t joboard-api .
 docker run -p 8080:8080 --env-file .env joboard-api
 ```
+
+## Deploy
+
+Publicado como **web service Docker no Render** (há um `Dockerfile` multi-stage). Em produção:
+
+- Ative o perfil de produção com `SPRING_PROFILES_ACTIVE=prod` — usa `ddl-auto=validate` (o schema é do Flyway, o Hibernate só valida) e desliga o log de SQL.
+- Todos os segredos vêm de variáveis de ambiente na plataforma; `server.port=${PORT:8080}` respeita a porta injetada.
+- No primeiro start o Flyway faz baseline do schema e aplica as migrações versionadas.
+
+O guia completo (variáveis, provedor de email, rotação de credenciais) está no `DEPLOY.md` e no `PASSO-A-PASSO-DEPLOY.md` (repositório-pai).
 
 ## Decisões de projeto
 
