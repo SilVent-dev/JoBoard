@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Size;
 public record CadastroDTO(
         @NotBlank(message = "Nome obrigatório") String nome,
         @NotBlank(message = "Email obrigatório") @Email(message = "Email inválido") String email,
-        @NotBlank(message = "Senha obrigatória") @Size(min = 8, message = "Senha deve ter no mínimo 8 caracteres") String senha
+        @NotBlank(message = "Senha obrigatória") @Size(min = 8, message = "Senha deve ter no mínimo 8 caracteres") String senha,
+        // Honeypot anti-bot: campo invisível no formulário, deve chegar sempre vazio
+        String website
 ) {
 }

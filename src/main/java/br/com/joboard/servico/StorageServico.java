@@ -1,6 +1,7 @@
 package br.com.joboard.servico;
 
 import br.com.joboard.configuracao.SupabaseProperties;
+import br.com.joboard.dominio.excecao.ArquivoInvalidoException;
 import lombok.RequiredArgsConstructor;
 import java.net.http.HttpRequest;
 import org.springframework.stereotype.Service;
@@ -93,13 +94,13 @@ public class StorageServico {
 
     private void validarArquivo(MultipartFile arquivo) {
         if (arquivo == null || arquivo.isEmpty()) {
-            throw new IllegalArgumentException("Arquivo não pode ser vazio.");
+            throw new ArquivoInvalidoException("Arquivo não pode ser vazio.");
         }
         if (arquivo.getSize() > TAMANHO_MAXIMO_BYTES) {
-            throw new IllegalArgumentException("Arquivo excede o tamanho máximo de 5MB.");
+            throw new ArquivoInvalidoException("Arquivo excede o tamanho máximo de 5MB.");
         }
         if (!TIPO_ACEITO.equals(arquivo.getContentType())) {
-            throw new IllegalArgumentException("Apenas arquivos PDF são aceitos.");
+            throw new ArquivoInvalidoException("Apenas arquivos PDF são aceitos.");
         }
     }
 }

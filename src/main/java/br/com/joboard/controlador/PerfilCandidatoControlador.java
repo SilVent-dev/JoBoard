@@ -22,8 +22,15 @@ public class PerfilCandidatoControlador {
         return ResponseEntity.ok(perfilCandidatoServico.buscar());
     }
 
+    @PostMapping
+    public ResponseEntity<PerfilCandidatoResponseDTO> salvar(
+            @RequestBody @Valid PerfilCandidatoRequestDTO dados) {
+        return ResponseEntity.created(null)
+                .body(perfilCandidatoServico.salvar(dados));
+    }
+
     @PutMapping
-    public ResponseEntity<PerfilCandidatoResponseDTO> salvar(@RequestBody @Valid PerfilCandidatoRequestDTO dados){
+    public ResponseEntity<PerfilCandidatoResponseDTO> atualizar(@RequestBody @Valid PerfilCandidatoRequestDTO dados){
         return ResponseEntity.ok(perfilCandidatoServico.salvar(dados));
     }
 }

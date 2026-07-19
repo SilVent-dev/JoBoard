@@ -44,6 +44,7 @@ public class EmpresaServico {
         return EmpresaResponseDTO.from(empresaRepositorio.save(empresa));
     }
 
+    @Transactional(readOnly = true)
     public List<EmpresaResponseDTO> listar() {
         Usuario usuarioLogado = SecurityUtils.getUsuarioLogado();
         return empresaRepositorio.findAllByUsuarioId(usuarioLogado.getId())
@@ -52,6 +53,7 @@ public class EmpresaServico {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public EmpresaResponseDTO buscarPorId(UUID id) {
         Usuario usuarioLogado = SecurityUtils.getUsuarioLogado();
         EmpresaCatalogada empresa = empresaRepositorio.findByIdAndUsuarioId(id, usuarioLogado.getId())

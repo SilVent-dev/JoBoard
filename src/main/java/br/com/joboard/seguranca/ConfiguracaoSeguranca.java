@@ -1,5 +1,6 @@
 package br.com.joboard.seguranca;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,7 +28,9 @@ public class ConfiguracaoSeguranca {
     private static final String[] ROTAS_PUBLICAS = {
             "/auth/cadastro",
             "/auth/login",
-            "/auth/verificar-email"
+            "/auth/verificar-email",
+            "/auth/esqueci-senha",
+            "/auth/redefinir-senha"
     };
 
     // Rotas acessíveis apenas por administradores
@@ -35,13 +38,14 @@ public class ConfiguracaoSeguranca {
             "/admin/**"
     };
 
+    // Origens permitidas, configuráveis por ambiente (dev: localhost; prod: domínio da Vercel)
+    @Value("${app.cors.allowed-origins}")
+    private List<String> allowedOrigins;
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(
-                "http://localhost:5173",   // Vue/Vite dev
-                "http://localhost:8080"
-        ));
+        config.setAllowedOrigins(allowedOrigins);
         config.setAllowedMethods(List.of(
                 "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
         ));

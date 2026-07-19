@@ -4,11 +4,16 @@ import br.com.joboard.dominio.evento.ContaPendenteEvento;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.authentication.LockedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -39,16 +44,31 @@ public class GlobalExceptionHandler {
                 .body(Map.of("mensagem", "Email de verificação reenviado. Confirme seu cadastro para continuar."));
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(Map.of("mensagem", ex.getMessage()));
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidacao(MethodArgumentNotValidException ex) {
+        String mensagem = ex.getBindingResult().getFieldErrors().stream()
+                .map(erro -> erro.getDefaultMessage())
+                .collect(Collectors.joining("; "));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("mensagem", mensagem.isBlank() ? "Requisição inválida." : mensagem));
     }
 
-    @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<Map<String, String>> handleIllegalState(IllegalStateException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("mensagem", ex.getMessage()));
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Map<String, String>> handleBadCredentials(BadCredentialsException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("mensagem", "Email ou senha incorretos."));
+    }
+
+    @ExceptionHandler(LockedException.class)
+    public ResponseEntity<Map<String, String>> handleContaBloqueada(LockedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("mensagem", "Conta bloqueada. Entre em contato com o suporte."));
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<Map<String, String>> handleContaDesativada(DisabledException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("mensagem", "Conta desativada."));
     }
 
     @ExceptionHandler(EmailJaCadastradoException.class)
@@ -94,6 +114,46 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleTransicaoInvalida(
             TransicaoStatusInvalidaException ex) {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(Map.of("mensagem", ex.getMessage()));
+    }
+
+    @ExceptionHandler(TokenRedefinicaoInvalidoException.class)
+    public ResponseEntity<Map<String, String>> handleTokenRedefinicaoInvalido(
+            TokenRedefinicaoInvalidoException ex) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(Map.of("mensagem", ex.getMessage()));
+    }
+
+    @ExceptionHandler(TokenVerificacaoInvalidoException.class)
+    public ResponseEntity<Map<String, String>> handleTokenVerificacaoInvalido(
+            TokenVerificacaoInvalidoException ex) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(Map.of("mensagem", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ResultadoFinalNaoDefinidoException.class)
+    public ResponseEntity<Map<String, String>> handleResultadoFinalNaoDefinido(
+            ResultadoFinalNaoDefinidoException ex) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(Map.of("mensagem", ex.getMessage()));
+    }
+
+    @ExceptionHandler(PretensaoSalarialInvalidaException.class)
+    public ResponseEntity<Map<String, String>> handlePretensaoSalarialInvalida(
+            PretensaoSalarialInvalidaException ex) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(Map.of("mensagem", ex.getMessage()));
+    }
+
+    @ExceptionHandler(SenhaIncorretaException.class)
+    public ResponseEntity<Map<String, String>> handleSenhaIncorreta(SenhaIncorretaException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("mensagem", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ArquivoInvalidoException.class)
+    public ResponseEntity<Map<String, String>> handleArquivoInvalido(ArquivoInvalidoException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Map.of("mensagem", ex.getMessage()));
     }
 

@@ -2,7 +2,9 @@ package br.com.joboard.controlador;
 
 import br.com.joboard.dominio.DTO.AutenticacaDTO;
 import br.com.joboard.dominio.DTO.CadastroDTO;
+import br.com.joboard.dominio.DTO.EsqueciSenhaDTO;
 import br.com.joboard.dominio.DTO.LoginRespostaDTO;
+import br.com.joboard.dominio.DTO.RedefinirSenhaDTO;
 import br.com.joboard.seguranca.UserDetailsImpl;
 import br.com.joboard.servico.TokenServico;
 import br.com.joboard.servico.UsuarioServico;
@@ -53,5 +55,19 @@ public class AutenticacaoControlador {
     public ResponseEntity<Map<String, String>> verificarEmail(@RequestParam String token){
         usuarioServico.verificarEmail(token);
         return ResponseEntity.ok(Map.of("mensagem", "Email confirmado com sucesso! Você já pode fazer login."));
+    }
+
+    @PostMapping("/esqueci-senha")
+    public ResponseEntity<Map<String, String>> esqueciSenha(@RequestBody @Valid EsqueciSenhaDTO data){
+        usuarioServico.solicitarRedefinicaoSenha(data.email());
+        // Resposta genérica sempre igual — não revela se o email existe
+        return ResponseEntity.ok(Map.of("mensagem",
+                "Se este email estiver cadastrado, você receberá um link para redefinir a senha."));
+    }
+
+    @PostMapping("/redefinir-senha")
+    public ResponseEntity<Map<String, String>> redefinirSenha(@RequestBody @Valid RedefinirSenhaDTO data){
+        usuarioServico.redefinirSenha(data.token(), data.novaSenha());
+        return ResponseEntity.ok(Map.of("mensagem", "Senha redefinida com sucesso! Você já pode fazer login."));
     }
 }

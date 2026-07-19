@@ -4,13 +4,12 @@ import br.com.joboard.dominio.DTO.PerfilCandidatoRequestDTO;
 import br.com.joboard.dominio.DTO.PerfilCandidatoResponseDTO;
 import br.com.joboard.dominio.entidade.PerfilCandidato;
 import br.com.joboard.dominio.entidade.Usuario;
+import br.com.joboard.dominio.excecao.PretensaoSalarialInvalidaException;
 import br.com.joboard.dominio.excecao.RecursoNaoEncontradoException;
 import br.com.joboard.repositorio.PerfilCandidatoRepositorio;
 import br.com.joboard.seguranca.SecurityUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Service
 public class PerfilCandidatoServico {
@@ -33,11 +32,9 @@ public class PerfilCandidatoServico {
     public PerfilCandidatoResponseDTO salvar (PerfilCandidatoRequestDTO dados){
         Usuario usuarioLogado = SecurityUtils.getUsuarioLogado();
 
-        validarCpfUnico(dados.cpf(), usuarioLogado.getId());
-
         if (dados.pretensaoSalarialMin() != null && dados.pretensaoSalarialMax() != null) {
             if (dados.pretensaoSalarialMin().compareTo(dados.pretensaoSalarialMax()) >= 0) {
-                throw new IllegalArgumentException("Pretensão mínima deve ser menor que a máxima.");
+                throw new PretensaoSalarialInvalidaException();
             }
         }
 
@@ -48,13 +45,13 @@ public class PerfilCandidatoServico {
                         .build());
 
         perfil.setNomeCompleto(dados.nomeCompleto());
-        perfil.setCpf(dados.cpf());
         perfil.setTelefone(dados.telefone());
         perfil.setCidade(dados.cidade());
         perfil.setEstado(dados.estado());
         perfil.setAceitaRemoto(dados.aceitaRemoto() != null ? dados.aceitaRemoto() : true);
         perfil.setAceitaHibrido(dados.aceitaHibrido() != null ? dados.aceitaHibrido() : true);
         perfil.setAceitaPresencial(dados.aceitaPresencial() != null ? dados.aceitaPresencial() : true);
+        perfil.setAceitaEmailFollowup(dados.aceitaEmailFollowup() != null ? dados.aceitaEmailFollowup() : true);
         perfil.setNivelExperiencia(dados.nivelExperiencia());
         perfil.setDisponibilidade(dados.disponibilidade());
         perfil.setPretensaoSalarialMin(dados.pretensaoSalarialMin());
@@ -65,11 +62,5 @@ public class PerfilCandidatoServico {
         perfil.setResumoProfissional(dados.resumoProfissional());
 
         return PerfilCandidatoResponseDTO.from(perfilCandidatoRepositorio.save(perfil));
-    }
-
-    private void validarCpfUnico(String cpf, UUID usuarioId) {
-        if(perfilCandidatoRepositorio.existsByCpfAndUsuarioIdNot(cpf, usuarioId)){
-            throw new IllegalStateException("Não foi possível completar o cadastro.");
-        }
     }
 }

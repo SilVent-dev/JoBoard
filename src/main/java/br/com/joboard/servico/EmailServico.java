@@ -18,30 +18,64 @@ public class EmailServico {
     @Value("${app.url.base}")
     private String urlBase;
 
+    @Value("${app.url.frontend}")
+    private String urlFrontend;
+
     public EmailServico(JavaMailSender mailSender){
         this.mailSender = mailSender;
     }
 
     public void enviarVerificacao(String destinatario, String nomeUsuario, String token){
         try {
-            String link = urlBase + "/auth/verificar-email?token=" + token;
-            String html = carregarTemplate().replace("{{nome}}", nomeUsuario).replace("{{link}}", link);
+            // aponta para a tela do frontend, que consome GET /auth/verificar-email
+            String link = urlFrontend + "/verificar-email?token=" + token;
+            String html = carregarTemplate("templates/verificacao-email.html")
+                    .replace("{{nome}}", nomeUsuario).replace("{{link}}", link);
 
-            MimeMessage mensagem = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mensagem, true, "UTF-8");
-            helper.setTo(destinatario);
-            helper.setSubject("Confirme seu cadastro - Joboard");
-            helper.setText(html, true);
-
-            mailSender.send(mensagem);
+            enviar(destinatario, "Confirme seu cadastro - Joboard", html);
         } catch (Exception e){
             throw new RuntimeException("Erro ao enviar email de verificação", e);
         }
 
     }
 
-    public String carregarTemplate() throws Exception{
-        ClassPathResource resource = new ClassPathResource("templates/verificacao-email.html");
+    public void enviarRedefinicaoSenha(String destinatario, String nomeUsuario, String token){
+        try {
+            String link = urlFrontend + "/redefinir-senha?token=" + token;
+            String html = carregarTemplate("templates/redefinicao-senha.html")
+                    .replace("{{nome}}", nomeUsuario).replace("{{link}}", link);
+
+            enviar(destinatario, "Redefinição de senha - Joboard", html);
+        } catch (Exception e){
+            throw new RuntimeException("Erro ao enviar email de redefinição de senha", e);
+        }
+    }
+
+    public void enviarFollowupDiario(String destinatario, String nomeUsuario, String itensHtml){
+        try {
+            String html = carregarTemplate("templates/followup-diario.html")
+                    .replace("{{nome}}", nomeUsuario)
+                    .replace("{{itens}}", itensHtml)
+                    .replace("{{link}}", urlFrontend);
+
+            enviar(destinatario, "Seus follow-ups de hoje - Joboard", html);
+        } catch (Exception e){
+            throw new RuntimeException("Erro ao enviar email de follow-up", e);
+        }
+    }
+
+    private void enviar(String destinatario, String assunto, String html) throws Exception {
+        MimeMessage mensagem = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mensagem, true, "UTF-8");
+        helper.setTo(destinatario);
+        helper.setSubject(assunto);
+        helper.setText(html, true);
+
+        mailSender.send(mensagem);
+    }
+
+    public String carregarTemplate(String caminho) throws Exception{
+        ClassPathResource resource = new ClassPathResource(caminho);
         return new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
     }
 }

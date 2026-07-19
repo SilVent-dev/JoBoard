@@ -30,15 +30,12 @@ public class PerfilCandidato {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
     @Column(name = "nome_completo", nullable = false, length = 255)
     private String nomeCompleto;
-
-    @Column(nullable = false, unique = true, length = 11)
-    private String cpf;
 
     @Column(length = 20)
     private String telefone;
@@ -60,6 +57,11 @@ public class PerfilCandidato {
     @Builder.Default
     @Column(name = "aceita_presencial", nullable = false)
     private Boolean aceitaPresencial = true;
+
+    // Consentimento para o email diário de follow-up (opt-out)
+    @Builder.Default
+    @Column(name = "aceita_email_followup", nullable = false)
+    private Boolean aceitaEmailFollowup = true;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "nivel_experiencia", length = 20)

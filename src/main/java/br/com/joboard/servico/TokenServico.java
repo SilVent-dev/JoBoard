@@ -8,9 +8,8 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 
 @Service
 public class TokenServico {
@@ -47,6 +46,7 @@ public class TokenServico {
     }
 
     private Instant genDataExpiracao(){
-        return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
+        // Instant é absoluto — expira em 2h independente do fuso do servidor
+        return Instant.now().plus(Duration.ofHours(2));
     }
 }

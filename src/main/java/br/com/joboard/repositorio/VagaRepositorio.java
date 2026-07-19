@@ -5,6 +5,7 @@ import br.com.joboard.dominio.enums.ModeloTrabalhoEnum;
 import br.com.joboard.dominio.enums.NivelExperienciaEnum;
 import br.com.joboard.dominio.enums.TipoContratoEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -15,6 +16,12 @@ import java.util.UUID;
 public interface VagaRepositorio extends JpaRepository<VagaRastreada, UUID> {
 
     Optional<VagaRastreada> findByIdAndUsuarioId(UUID id, UUID usuarioId);
+
+    List<VagaRastreada> findAllByUsuarioId(UUID usuarioId);
+
+    @Modifying
+    @Query("DELETE FROM VagaRastreada v WHERE v.usuario.id = :usuarioId")
+    void deletarTodosDoUsuario(UUID usuarioId);
 
     @Query("""
         SELECT v FROM VagaRastreada v

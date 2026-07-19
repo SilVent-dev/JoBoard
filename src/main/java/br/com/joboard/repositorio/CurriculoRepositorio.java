@@ -20,4 +20,8 @@ public interface CurriculoRepositorio extends JpaRepository<Curriculo, UUID> {
     @Modifying
     @Query("UPDATE Curriculo c SET c.ehPrincipal = false WHERE c.usuario.id = :usuarioId")
     void desmarcarTodosPrincipais(UUID usuarioId);
+
+    @Modifying
+    @Query("DELETE FROM Curriculo c WHERE c.usuario.id = :usuarioId")
+    void deletarTodosDoUsuario(UUID usuarioId);
 }

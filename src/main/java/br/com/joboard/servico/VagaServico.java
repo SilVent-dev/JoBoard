@@ -8,7 +8,6 @@ import br.com.joboard.dominio.entidade.VagaRastreada;
 import br.com.joboard.dominio.enums.ModeloTrabalhoEnum;
 import br.com.joboard.dominio.enums.NivelExperienciaEnum;
 import br.com.joboard.dominio.enums.TipoContratoEnum;
-import br.com.joboard.dominio.excecao.AcessoNegadoException;
 import br.com.joboard.dominio.excecao.RecursoNaoEncontradoException;
 import br.com.joboard.repositorio.EmpresaRepositorio;
 import br.com.joboard.repositorio.VagaRepositorio;
@@ -33,7 +32,7 @@ public class VagaServico {
 
         EmpresaCatalogada empresa = empresaRepositorio
                 .findByIdAndUsuarioId(dados.empresaId(), usuarioLogado.getId())
-                .orElseThrow(AcessoNegadoException::new);
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Empresa", dados.empresaId()));
 
         VagaRastreada vaga = VagaRastreada.builder()
                 .usuario(usuarioLogado)
@@ -54,6 +53,7 @@ public class VagaServico {
         return VagaResponseDTO.from(vagaRepositorio.save(vaga));
     }
 
+    @Transactional(readOnly = true)
     public List<VagaResponseDTO> listar(
             ModeloTrabalhoEnum modeloTrabalho,
             TipoContratoEnum tipoContrato,
@@ -73,6 +73,7 @@ public class VagaServico {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public VagaResponseDTO buscarPorId(UUID id) {
         Usuario usuarioLogado = SecurityUtils.getUsuarioLogado();
         return VagaResponseDTO.from(
@@ -90,7 +91,7 @@ public class VagaServico {
 
         EmpresaCatalogada empresa = empresaRepositorio
                 .findByIdAndUsuarioId(dados.empresaId(), usuarioLogado.getId())
-                .orElseThrow(AcessoNegadoException::new);
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Empresa", dados.empresaId()));
 
 
         vaga.setEmpresa(empresa);

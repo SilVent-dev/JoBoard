@@ -5,17 +5,12 @@ import br.com.joboard.dominio.enums.TipoDisponibilidadeEnum;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import org.hibernate.validator.constraints.br.CPF;
 
 import java.math.BigDecimal;
 
 public record PerfilCandidatoRequestDTO(
         @NotBlank(message = "Nome completo obrigatório")
         String nomeCompleto,
-
-        @NotBlank(message = "CPF obrigatório")
-        @CPF(message = "CPF inválido")
-        String cpf,
 
         @Size(max = 20)
         String telefone,
@@ -29,6 +24,7 @@ public record PerfilCandidatoRequestDTO(
         Boolean aceitaRemoto,
         Boolean aceitaHibrido,
         Boolean aceitaPresencial,
+        Boolean aceitaEmailFollowup,
 
         NivelExperienciaEnum nivelExperiencia,
         TipoDisponibilidadeEnum disponibilidade,

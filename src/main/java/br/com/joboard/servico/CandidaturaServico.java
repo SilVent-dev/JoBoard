@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -69,6 +70,28 @@ public class CandidaturaServico {
         TRANSICOES_VALIDAS.put(StatusProcessoSeletivoEnum.DESISTIDA, EnumSet.noneOf(StatusProcessoSeletivoEnum.class));
     }
 
+    private record AcaoSugerida(int diasAteAcao, String descricao) {}
+
+    // Próxima ação sugerida ao entrar em cada status; status finais não têm
+    // sugestão (a próxima ação é limpa)
+    private static final Map<StatusProcessoSeletivoEnum, AcaoSugerida> ACOES_SUGERIDAS;
+
+    static {
+        ACOES_SUGERIDAS = new EnumMap<>(StatusProcessoSeletivoEnum.class);
+        ACOES_SUGERIDAS.put(StatusProcessoSeletivoEnum.APLICADA,
+                new AcaoSugerida(7, "Fazer follow-up da aplicação"));
+        ACOES_SUGERIDAS.put(StatusProcessoSeletivoEnum.TRIAGEM_TELEFONICA,
+                new AcaoSugerida(3, "Confirmar próximos passos da triagem"));
+        ACOES_SUGERIDAS.put(StatusProcessoSeletivoEnum.ENTREVISTA_TECNICA,
+                new AcaoSugerida(5, "Cobrar retorno da entrevista técnica"));
+        ACOES_SUGERIDAS.put(StatusProcessoSeletivoEnum.ENTREVISTA_COMPORTAMENTAL,
+                new AcaoSugerida(5, "Cobrar retorno da entrevista comportamental"));
+        ACOES_SUGERIDAS.put(StatusProcessoSeletivoEnum.TESTE_PRATICO,
+                new AcaoSugerida(5, "Cobrar retorno do teste prático"));
+        ACOES_SUGERIDAS.put(StatusProcessoSeletivoEnum.PROPOSTA_RECEBIDA,
+                new AcaoSugerida(2, "Responder a proposta"));
+    }
+
     @Transactional
     public CandidaturaResponseDTO criar(CandidaturaRequestDTO dados) {
         Usuario usuarioLogado = SecurityUtils.getUsuarioLogado();
@@ -116,6 +139,7 @@ public class CandidaturaServico {
         return CandidaturaResponseDTO.from(salva);
     }
 
+    @Transactional(readOnly = true)
     public List<CandidaturaResponseDTO> listar() {
         Usuario usuarioLogado = SecurityUtils.getUsuarioLogado();
         return candidaturaRepositorio
@@ -125,6 +149,7 @@ public class CandidaturaServico {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public CandidaturaResponseDTO buscarPorId(UUID id) {
         Usuario usuarioLogado = SecurityUtils.getUsuarioLogado();
         return CandidaturaResponseDTO.from(
@@ -153,6 +178,8 @@ public class CandidaturaServico {
 
         candidatura.setStatus(novoStatus);
 
+        aplicarProximaAcao(candidatura, dados, novoStatus);
+
         if (novoStatus == StatusProcessoSeletivoEnum.ACEITA) {
             candidatura.setResultadoFinal(ResultadoFinalEnum.APROVADO);
         } else if (novoStatus == StatusProcessoSeletivoEnum.REJEITADA) {
@@ -166,6 +193,26 @@ public class CandidaturaServico {
         historicoServico.registrarMudancaStatus(salva, statusAtual, novoStatus);
 
         return CandidaturaResponseDTO.from(salva);
+    }
+
+    // Próxima ação explícita do usuário tem prioridade; sem ela, entra a
+    // sugestão do mapa. Status final limpa a próxima ação.
+    private void aplicarProximaAcao(Candidatura candidatura, AtualizarStatusDTO dados,
+                                    StatusProcessoSeletivoEnum novoStatus) {
+        if (dados.proximaAcaoEm() != null || dados.proximaAcaoDescricao() != null) {
+            candidatura.setProximaAcaoEm(dados.proximaAcaoEm());
+            candidatura.setProximaAcaoDescricao(dados.proximaAcaoDescricao());
+            return;
+        }
+
+        AcaoSugerida sugerida = ACOES_SUGERIDAS.get(novoStatus);
+        if (sugerida != null) {
+            candidatura.setProximaAcaoEm(LocalDate.now().plusDays(sugerida.diasAteAcao()));
+            candidatura.setProximaAcaoDescricao(sugerida.descricao());
+        } else {
+            candidatura.setProximaAcaoEm(null);
+            candidatura.setProximaAcaoDescricao(null);
+        }
     }
 
     @Transactional
@@ -198,8 +245,7 @@ public class CandidaturaServico {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Candidatura", id));
 
         if (candidatura.getResultadoFinal() == null) {
-            throw new IllegalStateException(
-                    "Não é possível arquivar uma candidatura sem resultado final definido.");
+            throw new ResultadoFinalNaoDefinidoException();
         }
 
         candidatura.setArquivada(true);
