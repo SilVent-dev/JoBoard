@@ -1,6 +1,8 @@
 package br.com.joboard.servico;
 
 import jakarta.mail.internet.MimeMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.SimpleMailMessage;
@@ -12,6 +14,8 @@ import java.nio.charset.StandardCharsets;
 
 @Service
 public class EmailServico {
+
+    private static final Logger log = LoggerFactory.getLogger(EmailServico.class);
 
     private final JavaMailSender mailSender;
 
@@ -39,6 +43,7 @@ public class EmailServico {
 
             enviar(destinatario, "Confirme seu cadastro - Joboard", html);
         } catch (Exception e){
+            log.error("Falha ao enviar email de verificação para {}: {}", destinatario, e.getMessage(), e);
             throw new RuntimeException("Erro ao enviar email de verificação", e);
         }
 
